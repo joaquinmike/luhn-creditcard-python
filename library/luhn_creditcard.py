@@ -1,6 +1,7 @@
 '''
 Validates popular debit and credit cards numbers against regular expressions and Luhn algorithm.
 Also validates the CVC and the expiration date.
+https://github.com/joaquinmike/luhn-creditcard-python
 
 Converted code of Php (http://inacho.es)
 '''
