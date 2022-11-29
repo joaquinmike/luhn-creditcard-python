@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+
+import re
+import sys
+
+
 '''
 Validates popular debit and credit cards numbers against regular expressions and Luhn algorithm.
 Also validates the CVC and the expiration date.
@@ -5,122 +11,149 @@ https://github.com/joaquinmike/luhn-creditcard-python
 
 Converted code of Php (http://inacho.es)
 '''
-import re
+
 
 class libraryLuhnCreditCard(object):
 
     cards = {
-        'visaelectron':{
+        'visaelectron': {
             'type': 'visaelectron',
             'pattern': r'^4(026|17500|405|508|844|91[37])',
-            'length':{16},
-            'cvcLength':{3},
+            'length': {16},
+            'cvcLength': {3},
             'luhn': True,
         },
-        'maestro':{
+        'maestro': {
             'type': 'maestro',
             'pattern': r'^(5(018|0[23]|[68])|6(39|7))',
-            'length':{12, 13, 14, 15, 16, 17, 18, 19},
-            'cvcLength':{3},
+            'length': {12, 13, 14, 15, 16, 17, 18, 19},
+            'cvcLength': {3},
             'luhn': True,
         },
-        'forbrugsforeningen':{
+        'forbrugsforeningen': {
             'type': 'forbrugsforeningen',
             'pattern': r'^600',
-            'length':{16},
-            'cvcLength':{3},
+            'length': {16},
+            'cvcLength': {3},
             'luhn': True,
         },
-        'dankort':{
+        'dankort': {
             'type': 'dankort',
             'pattern': r'^5019',
-            'length':{16},
-            'cvcLength':{3},
+            'length': {16},
+            'cvcLength': {3},
             'luhn': True,
         },
-        #Credit cards
-        'visa':{
+        # Credit cards
+        'visa': {
             'type': 'visa',
             'pattern': r'^4',
-            'length':{13, 16},
-            'cvcLength':{3},
+            'length': {13, 16},
+            'cvcLength': {3},
             'luhn': True,
         },
-        'mastercard':{
+        'mastercard': {
             'type': 'mastercard',
             'pattern': r'^(5[0-5]|2[2-7])',
-            'length':{16},
-            'cvcLength':{3},
+            'length': {16},
+            'cvcLength': {3},
             'luhn': True,
         },
-        'amex':{
+        'amex': {
             'type': 'amex',
             'pattern': r'^3[47]',
             'format': r'(\d{1,4})(\d{1,6})?(\d{1,5})?',
-            'length':{15},
-            'cvcLength':{3, 4},
+            'length': {15},
+            'cvcLength': {3, 4},
             'luhn': True,
         },
-        'dinersclub':{
+        'dinersclub': {
             'type': 'dinersclub',
             'pattern': r'^3[0689]',
-            'length':{14},
-            'cvcLength':{3},
+            'length': {14},
+            'cvcLength': {3},
             'luhn': True,
         },
-        'discover':{
+        'diners': {
+            'type': 'dinersclub',
+            'pattern': r'^3[0689]',
+            'length': {14},
+            'cvcLength': {3},
+            'luhn': True,
+        },
+        'discover': {
             'type': 'discover',
             'pattern': r'^6([045]|22)',
             'length':{16},
             'cvcLength':{3},
             'luhn': True,
         },
-        'unionpay':{
+        'unionpay': {
             'type': 'unionpay',
             'pattern': r'^(62|88)',
-            'length':{16, 17, 18, 19},
-            'cvcLength':{3},
+            'length': {16, 17, 18, 19},
+            'cvcLength': {3},
             'luhn': False,
         },
-        'jcb':{
+        'jcb': {
             'type': 'jcb',
             'pattern': r'^35',
-            'length':{16},
-            'cvcLength':{3},
+            'length': {16},
+            'cvcLength': {3},
             'luhn': True,
         },
 
     }
 
     @staticmethod
-    def validCreditCard(number, type = None):
+    def validCreditCard(number, type_card=None):
         try:
-            ret = {'valid': False,'number': '','type': ''}
-            #Strip non-numeric characters
+            ret = {'valid': False, 'number': '', 'type': ''}
+            # Strip non-numeric characters
             number = str(re.sub('/[^0-9]/', '', number))
 
-            if not type:
-                type = libraryLuhnCreditCard.creditCardType(number);
+            if not type_card:
+                type_card = libraryLuhnCreditCard.creditCardType(number)
 
-
-            if type in libraryLuhnCreditCard.cards and libraryLuhnCreditCard.validCard(number,type):
+            if type_card in libraryLuhnCreditCard.cards and libraryLuhnCreditCard.validCard(number, type_card):
                 return {
                     'valid': True,
                     'number': number,
-                    'type': type
+                    'type': type_card
                 }
+            '''if date and package:
+                date_card = date.split('/')
+                prod_package = package.split('|')
+                year = date_card[1]
+                month = date_card[0]
+                if prod_package[0] = 'mensual':
+                    pass
+                elif prod_package[0] = 'semestral':
+                    pass
+                elif prod_package[0] = 'anual':
+                    date_expired = timedelta(days=30) + datetime.now()'''
+
             return ret
 
-        except ValueError:
-            print("Oops!  That was no valid number.  Try again...")
+        except Exception, e:
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            traceback_details = {
+                'filename': exc_traceback.tb_frame.f_code.co_filename,
+                'lineno'  : exc_traceback.tb_lineno,
+                'name'    : exc_traceback.tb_frame.f_code.co_name,
+                'type'    : exc_type.__name__,
+                'message' : exc_value.message, # or see traceback._some_str()
+            }
+            print traceback_details
 
     @staticmethod
     def validCard(number, type):
-        return (libraryLuhnCreditCard.validPattern(number, type) and libraryLuhnCreditCard.validLength(number, type) and libraryLuhnCreditCard.validLuhn(number, type));
+        return (libraryLuhnCreditCard.validPattern(number, type) and libraryLuhnCreditCard.validLength(number, type)
+                and libraryLuhnCreditCard.validLuhn(number, type))
 
     @staticmethod
-    def validPattern(number, type):
-        matches = re.search(libraryLuhnCreditCard.cards[type]['pattern'], number)
+    def validPattern(number, type_card):
+        matches = re.search(libraryLuhnCreditCard.cards[type_card]['pattern'], number)
         return matches
 
     @staticmethod
@@ -129,7 +162,6 @@ class libraryLuhnCreditCard(object):
             match = re.search(data['pattern'], number)
             if(match):
                 return type
-
         return ''
 
     @staticmethod
@@ -162,10 +194,10 @@ class libraryLuhnCreditCard(object):
             checksum = 0
             dlen = int(len(number))
             ini = 2 - (dlen % 2) - 1
-            for i in range(ini,dlen,2):
+            for i in range(ini, dlen, 2):
                 checksum += int(number[i])
 
-            #Analyze odd digits in even length strings or even digits in odd length strings.
+            # Analyze odd digits in even length strings or even digits in odd length strings.
             ini = (dlen % 2) + 1
             for i in range(ini,dlen,2):
                 digit = int(number[i - 1]) * 2
@@ -179,6 +211,13 @@ class libraryLuhnCreditCard(object):
             else:
                 return False
 
-        except ValueError:
-            print("Oops!.  Try again...")
+        except Exception, e:
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            traceback_details = {
+                'filename': exc_traceback.tb_frame.f_code.co_filename,
+                'lineno'  : exc_traceback.tb_lineno,
+                'name'    : exc_traceback.tb_frame.f_code.co_name,
+                'type'    : exc_type.__name__,
+                'message' : exc_value.message, # or see traceback._some_str()
+            }
             return False
